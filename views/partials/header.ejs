@@ -1,0 +1,58 @@
+<!-- views/partials/header.ejs -->
+
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">P&T Budget App</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link <%= location == "dashboard" ? 'active' : ''%>" aria-current="page" href="/dashboard">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link <%= location == "merchants" ? 'active' : ''%>" href="/merchants">Merchants</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link <%= location == "budgets" ? 'active' : ''%>" href="/budgets">Budgets</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link <%= location == "categories" ? 'active' : ''%>" href="/categories">Categories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link <%= location == "transactions" ? 'active' : ''%>" href="/transactions">All Transactions</a>
+          </li>
+
+          <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li> -->
+          <!-- <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          </li> -->
+        </ul>
+        <!-- <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form> -->
+        <li class="nav-item d-flex" style="margin-right: 1%;">
+          <span>Hello <%= username %>!</span>
+        </li>
+        <li class="nav-item d-flex" style="margin-right: 1%;">
+            <button class="btn btn-outline-warning d-flex" type="button" onclick="window.location.href = '/settings';">Settings</button>  
+            <!-- <a class="nav-link <%= location == "settings" ? 'active' : ''%>" href="/settings">Settings</a> -->
+          </li>
+        <button class="btn btn-outline-danger d-flex" type="button" onclick="window.location.href = '/logout';">Logout</button>
+      </div>
+    </div>
+  </nav>
+  <div id="alertPlaceholder" class="container"></div>

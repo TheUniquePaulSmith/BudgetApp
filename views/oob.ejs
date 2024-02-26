@@ -1,0 +1,84 @@
+<!-- views/oob.ejs -->
+
+<% function createError(registerError) {
+    %>
+    <div id="loginAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+     <%= registerError %>
+     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+     </div>
+     <% } %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>First time setup...</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/app.css" />
+  </head>
+  <body>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">P&T Budget App</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </nav>
+    <div id="alertPlaceholder" class="container"></div>
+    <div class="container mt-5">
+      <%= registerError != null ? createError(registerError) : '' %>
+      <div id="RegisterForm" class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">Passkey - First time setup</div>
+            <div class="card-body">
+              <form id="registerForm" action="/" method="post" onsubmit="performWebAuthNRegistration('<%=sChallenge%>'); return false;" >
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="InputUsername"
+                    name="InputUsername"
+                    aria-describedby="usernameHelp"
+                    placeholder="Enter username"
+                  />
+                  <small id="usernameHelp" class="form-text text-muted">Username to create and register authenticator with</small>
+                </div>
+                <br />
+                <div class="form-group">
+                  <label for="exampleInputPassword1">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="InputPassword"
+                    name="InputPassword"
+                    placeholder="Password"
+                  />
+                  <small id="usernameHelp" class="form-text text-muted">Initial One Time Password</small>
+                </div>
+                <br />
+                <!--<button type="button" onclick="performWebAuthNRegistration('<%=sChallenge%>');" class="btn btn-primary">Register</button>-->
+                <input type="hidden" id="fido2cred" name="fido2cred" />
+                <input type="submit" class="btn btn-primary" value="Register" />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="./js/app.js"></script>
+    <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+  </body>
+</html>

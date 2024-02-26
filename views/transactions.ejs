@@ -1,0 +1,175 @@
+<!-- views/transactions.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transactions</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/app.css" />
+    <link rel="stylesheet" href="./js/tablefilter/style/tablefilter.css" />
+  </head>
+  <body>
+    <script
+      type="text/javascript"
+      src="./js/tablefilter/tablefilter.js"
+    ></script>
+    <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/app.js"></script>
+
+    <%- include('./partials/header.ejs') %>
+
+    <div class="container mt-5">
+      <h2>Transactions</h2>
+      <div class="d-flex" style="align-items: flex-start;">
+      <table
+        id="allTransactions"
+        class="table table-sm table-striped table-dark"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Charger</th>
+            <th scope="col">TransDate</th>
+            <th scope="col">Month</th>
+            <th scope="col">Year</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Merchant</th>
+            <th scope="col">Company</th>
+            <th scope="col">Category</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% transactions.forEach(transaction => { %>
+          <tr>
+            <td><%= transaction.Charger %></td>
+            <td><%= transaction.TransDate %></td>
+            <td><%= transaction.Month %></td>
+            <td><%= transaction.Year %></td>
+            <td
+              style="color: <%= transaction.Amount > 0 ? 'red' : 'green' %> ;"
+            >
+              $<%= transaction.Amount %>
+            </td>
+            <td
+              data-bs-html="true"
+              data-bs-container="body"
+              data-bs-toggle="popover"
+              data-bs-placement="right"
+              data-bs-content="<%=transaction.MerchantCity%>, <%=transaction.MerchantState%><br /><%=transaction.ReferenceNumber%>"
+            >
+              <%= transaction.Merchant.trim() %>
+            </td>
+            <td>
+              <%= transaction.Company == null ? '0_Undefined' :
+              transaction.Company %>
+            </td>
+            <td></td>
+            <td>
+              <a
+                href="/transactions/<%= transaction.Id %>/edit"
+                class="btn btn-sm btn-primary"
+                >Edit</a
+              >
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <div class="d-flex" style="flex-direction: column; align-items: stretch; margin-left: 1%;">
+        <span>Visible:</span>
+        <code>Sum:</code><span id="vis-sum" class="badge"></span>
+        <code>Avg:</code><span id="vis-mean" class="badge"></span>
+        <!-- <code>Median:</code><span id="vis-median" class="badge"></span> -->
+        <code>Min:</code><span id="vis-min" class="badge"></span>
+        <code>max:</code><span id="vis-max" class="badge"></span>
+        <br />
+        <br />
+        <span>Filtered:</span>
+        <code>Sum:</code> <span id="flt-sum" class="badge"></span>
+        <code>Avg:</code> <span id="flt-mean" class="badge"></span>
+        <!-- <code>Median:</code> <span id="flt-median" class="badge"></span> -->
+        <code>Min:</code> <span id="flt-min" class="badge"></span>
+        <code>max:</code> <span id="flt-max" class="badge"></span>
+      </div>
+    </div>
+    </div>
+    <script>
+      var tf = new TableFilter(document.querySelector("#allTransactions"), {
+        base_path: "/js/tablefilter/",
+        paging: {
+          results_per_page: ["Records: ", [25, 50, 100]],
+        },
+        state: {
+          types: ["local_storage"],
+          filters: true,
+          page_number: true,
+          page_length: true,
+          sort: true,
+        },
+        grid_layout: false,
+        alternate_rows: false,
+        btn_reset: true,
+        rows_counter: true,
+        loader: true,
+        status_bar: true,
+        col_types: [
+          "string",
+          { type: "date", locale: "en-US", format: ["{MM}/{dd}/{yyyy}"] },
+          { type: "date", locale: "en-US", format: ["{Month}"] },
+          { type: "date", locale: "en-US", format: ["{yyyy}"] },
+          "formatted-number",
+          "string",
+          "string",
+          "string",
+          "none",
+        ],
+        col_0: "select",
+        col_2: "select",
+        col_3: "select",
+        col_6: "select",
+        col_7: "select",
+        extensions: [
+          {
+            name: "sort",
+          },
+          {
+            name: "colOps",
+            col: [4],
+          },
+        ],
+      });
+
+      // subscribe to 'column-calc' event emitted whenever a calculation is
+      // performed on a column
+      tf.emitter.on(["column-calc"], calcAll);
+
+      tf.init();
+    </script>
+
+    <script>
+      $(function () {
+        // $('[data-bs-toggle="popover"]').popover()
+        $('[data-bs-toggle="popover"]').popover({
+          html: true,
+          container: "body",
+        });
+
+        $('[data-bs-toggle="popover"]').click(function (e) {
+          e.preventDefault();
+          $('[data-bs-toggle="popover"]').not(this).popover("hide");
+          $(this).popover("toggle");
+        });
+
+        $(document).click(function (e) {
+          if (
+            $(e.target).parent().find('[data-bs-toggle="popover"]').length > 0
+          ) {
+            $('[data-bs-toggle="popover"]').popover("hide");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

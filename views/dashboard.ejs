@@ -1,0 +1,86 @@
+<!-- views/home.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/app.css" />
+    <link rel="stylesheet" href="./js/tablefilter/style/tablefilter.css" />
+  </head>
+  <body>
+    <script type="text/javascript" src="./js/tablefilter/tablefilter.js"></script>
+    <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    
+
+    <%- include('./partials/header.ejs') %>
+
+
+    <div class="container mt-5">
+      <h1>Monthly</h1>
+
+      <div class="container mt-5 fixedTable">
+        <h2>Total cost by charger</h2>
+        <table id="monthlyCharger" class="table table-striped table-dark"> 
+          <!-- class="table table-sm table-striped table-dark" -->
+          <thead>
+              <tr>
+                  <th scope="col">Charger</th>
+                  <th scope="col">Month</th>
+                  <th scope="col">Amount</th>
+              </tr>
+          </thead>
+          <tbody>
+            <% transactions.forEach(transaction => { %>
+              <tr>
+                  <td><%= transaction.Name %></td>
+                  <td><%= transaction.Month %></td>
+                  <td style="color: <%= parseFloat(transaction.Amount.replace('$','')) > 0 ? 'red' : 'green' %>;"><%= transaction.Amount %></td>
+              </tr>
+          <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    <div class="container mt-5">
+      <h1>Yearly</h1>
+    </div>
+
+    <script>
+      var tf = new TableFilter(document.querySelector('#monthlyCharger'), {
+          base_path: '/js/tablefilter/',
+          paging: {
+            results_per_page: ['Records: ', [10, 25, 50, 100]]
+          },
+          state: {
+            types: ['local_storage'],
+            filters: true,
+            page_number: true,
+            page_length: true,
+            sort: true
+          },
+          grid_layout: false,
+          alternate_rows: false,
+          btn_reset: true,
+          rows_counter: true,
+          loader: true,
+          status_bar: true,
+          col_types: [
+            'string',
+            {type: 'date', locale: 'en-US', format: ['{mmmm - yy}']},
+            'formatted-number',
+          ],
+          col_0: 'select',
+          col_1: 'select',
+          extensions:[{
+            name: 'sort'
+        }]
+      });
+      tf.init();
+      </script>
+
+  </body>
+</html>

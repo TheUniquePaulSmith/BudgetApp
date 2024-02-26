@@ -1,0 +1,92 @@
+body {
+    /* background-color: darkgray; */
+    background-image: url("/images/background.jpg");
+    /* background-repeat: no-repeat; */
+    background-repeat: repeat-y;
+    background-size: cover;
+
+    color: whitesmoke;
+}
+
+div .card-body {
+    text-align: center !important;
+}
+
+#loginBtnLogo {
+    width: 30vw;
+    height: 30vh;
+}
+
+#loginBtnLogo :hover {
+    color: lightblue;
+}
+
+#registerForm {
+    text-align: left;
+
+}
+
+#loginForm {
+    justify-content: center;
+    align-content: center;
+    /* height: 90vh; */
+}
+
+.fixedTable {
+  overflow-x: auto;
+  height: 50vh;
+}
+
+.headerSubtext {
+  color: lightcoral;
+}
+
+#newMerchantForm {
+  text-align: left;
+}
+
+/* .glow {
+    font-size: 80px;
+    color: #000;
+    text-align: center;
+    animation: glow 1s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      text-shadow: 0 0 10px #000,
+                   0 0 20px #000,
+                   0 0 30px #e60073,
+                   0 0 40px #e60073,
+                   0 0 50px #e60073,
+                   0 0 60px #e60073,
+                   0 0 70px #e60073;
+    }
+    to {
+      text-shadow: 0 0 20px #fff,
+                   0 0 30px #ff4da6,
+                   0 0 40px #ff4da6,
+                   0 0 50px #ff4da6,
+                   0 0 60px #ff4da6,
+                   0 0 70px #ff4da6,
+                   0 0 80px #ff4da6;
+    }
+  } */
+  
+
+/* @keyframes rotateBorder {
+    0% {
+      border-width: 5px;
+      transform: rotate(0deg);
+    }
+    100% {
+      border-width: 10px;
+      transform: rotate(360deg);
+    }
+  }
+  
+  .rotating-border {
+    border: solid 5px #4CAF50;
+    animation: rotateBorder 3s infinite linear;
+  } */
+  

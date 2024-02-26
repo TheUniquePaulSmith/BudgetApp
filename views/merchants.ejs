@@ -1,0 +1,149 @@
+<!-- views/merchants.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Merchants</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/app.css" />
+    <link rel="stylesheet" href="./js/tablefilter/style/tablefilter.css" />
+  </head>
+  <body>
+    <script
+      type="text/javascript"
+      src="./js/tablefilter/tablefilter.js"
+    ></script>
+    <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/app.js"></script>
+
+    <%- include('./partials/header.ejs') %>
+
+    <div class="container mt-5">
+      <h1>Defined Merchants</h1>
+      <table
+        id="merchantsTable"
+        class="table table-sm table-striped table-dark"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% merchants.forEach(merchant => { %>
+          <tr>
+            <td><%= merchant.Name %></td>
+            <td><%= merchant.Description %></td>
+            <td>
+              <div class="d-flex">
+                <div>
+                  <a
+                    href="/merchants/<%= merchant.Id %>/edit"
+                    class="btn btn-sm btn-primary"
+                    >Edit</a
+                  >
+                </div>
+                <div class="ms-auto">
+                  <button
+                    type="button"
+                    onclick="confirmDelete(<%=merchant.Id%>, '<%=merchant.Name%>');"
+                    class="btn btn-sm btn-danger"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <hr />
+      <div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              Create New Merchant
+              <div>
+                <small class="headerSubtext"
+                  >Please search and make sure the merchant doesn't already
+                  exist before creating a new one</small
+                >
+              </div>
+            </div>
+            <div class="card-body">
+              <form
+                id="newMerchantForm"
+                action="/"
+                method="post"
+                onsubmit="alert('done'); return false;"
+              >
+                <div class="form-group">
+                  <label for="InputName">Merchant Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="InputName"
+                    name="InputName"
+                    aria-describedby="nameHelp"
+                    placeholder="(E.g. Abercombie & Fitch)"
+                  />
+                  <small id="nameHelp" class="form-text text-muted"
+                    >Short and friendly name to identify the merchant</small
+                  >
+                </div>
+                <br />
+                <div class="form-group">
+                  <label for="exampleInputPassword1">Merchant Description</label>
+                  <textarea
+                  class="form-control"
+                  id="InputDescription"
+                  name="InputDescription"
+                  rows="5"
+                  placeholder="(A short friendly description of the merchant and what they do)"
+                  ></textarea>
+                </div>
+                <br />
+                <input type="hidden" id="fido2cred" name="fido2cred" />
+                <input type="submit" class="btn btn-primary" value="Register" />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var tf = new TableFilter(document.querySelector("#merchantsTable"), {
+        base_path: "/js/tablefilter/",
+        paging: {
+          results_per_page: ["Records: ", [50, 100]],
+        },
+        state: {
+          types: ["local_storage"],
+          filters: true,
+          page_number: true,
+          page_length: true,
+          sort: true,
+        },
+        grid_layout: false,
+        alternate_rows: false,
+        btn_reset: true,
+        rows_counter: true,
+        loader: true,
+        status_bar: true,
+        col_types: ["string", "string", "none"],
+        extensions: [
+          {
+            name: "sort",
+          },
+        ],
+      });
+      tf.init();
+    </script>
+  </body>
+</html>
