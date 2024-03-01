@@ -8,6 +8,9 @@ const config = {
   user: "root",
   password: "root",
   database: "Huntington",
+  waitForConnections: true,
+  connectionLimit: 20,
+  queueLimit: 0
 };
 
 const pool = mysql.createPool(config);
@@ -114,20 +117,12 @@ async function getTransactions() {
 
 }
 
-  async function getMonthlyChargers(offset, limit) {
+  async function getMonthlyChargers() {
     const connection = await pool.getConnection();
     var query = sqlStrings.monthly.chargerQuery;
 
-    if (limit) {
-      query = query + " LIMIT ?, ?";
-    }
-
     try {
-      const [results, columns] = await connection.query(query, [offset, limit]);
-      const [countResult, columns2] = await connection.query(sqlStrings.monthly.chargerQueryTotals);
-
-      const totalTransactions = countResult[0].total;
-      const totalPages = limit == null ? 0 : Math.ceil(totalTransactions / limit);
+      const [results, columns] = await connection.query(query, []);
       
       //Fix up dates
       const formattedTransactions = results.map((transaction) => ({
@@ -136,7 +131,7 @@ async function getTransactions() {
         Amount: helper.formatCurrency(transaction.Amount),
       }));
 
-      return {formattedTransactions: formattedTransactions, totalPages: totalPages};
+      return formattedTransactions;
 
     } catch (error) {
       console.log(`getMonthlyChargers error: ${error}`);
@@ -160,6 +155,64 @@ async function getTransactions() {
       connection.release();
     }
   }
+
+  async function getYearlyChargers() {
+    const connection = await pool.getConnection();
+
+    try {
+      const [result, columns] = await connection.query(sqlStrings.yearly.chargerQuery, []);
+
+       //Fix up dates
+       const formattedTransactions = result.map((transaction) => ({
+        ...transaction,
+        Amount: helper.formatCurrency(transaction.Amount)
+      }));
+
+      return formattedTransactions;
+    } catch (error) {
+      console.log(`getYearlyChargers error: ${error}`);
+    }
+  }
+
+  async function getMonthlyMerchants() {
+    const connection = await pool.getConnection();
+
+    try {
+      const [result, columns] = await connection.query(sqlStrings.monthly.merchantQuery, []);
+
+       //Fix up dates
+       const formattedTransactions = result.map((transaction) => ({
+        ...transaction,
+        Month: helper.formatMonth(`${transaction.Year}-${transaction.Month}-1`),
+        Amount: helper.formatCurrency(transaction.Amount)
+      }));
+
+      return formattedTransactions;
+    } catch (error) {
+      console.log(`getMonthlyMerchants error: ${error}`);
+    }
+  }
+
+  async function getYearlyMerchants() {
+    const connection = await pool.getConnection();
+
+    try {
+      const [result, columns] = await connection.query(sqlStrings.yearly.merchantQuery, []);
+
+       //Fix up dates
+       const formattedTransactions = result.map((transaction) => ({
+        ...transaction,
+        Amount: helper.formatCurrency(transaction.Amount)
+      }));
+
+      return formattedTransactions;
+    } catch (error) {
+      console.log(`getYearlyMerchants error: ${error}`);
+    }
+  }
+
+
+
 module.exports = {
   checkOOBMode: checkOOBMode,
   createOOBUser: registerOOBUser,
@@ -167,5 +220,9 @@ module.exports = {
   getUserFido2Entry: getUserFido2Entry,
   getTransactions: getTransactions,
   getMonthlyChargers: getMonthlyChargers,
-  getMerchants: getMerchants
+  getMonthlyMerchants: getMonthlyMerchants,
+  getMerchants: getMerchants,
+  getYearlyChargers: getYearlyChargers,
+  getYearlyMerchants: getYearlyMerchants,
+  
 };

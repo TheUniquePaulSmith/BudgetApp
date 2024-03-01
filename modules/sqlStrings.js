@@ -1,11 +1,18 @@
 class monthlyQueries {
     static chargerQuery = "Select Chargers.Name, MONTH(TransDate) Month, YEAR(TransDate) Year, SUM(Amount) Amount from Transactions LEFT JOIN Chargers ON Transactions.ChargerId = Chargers.Id WHERE Flag = 'D' group by Chargers.Name, MONTH(TransDate), YEAR(TransDate) order by Name, Month, Year"
     static chargerQueryTotals = "select count(*) from (select Chargers.Name, MONTH(TransDate) Month, YEAR(TransDate) Year, SUM(Amount) from Transactions LEFT JOIN Chargers ON Transactions.ChargerId = Chargers.Id WHERE Flag = 'D' group by Chargers.Name, MONTH(TransDate), YEAR(TransDate) order by Name, Month, Year) nested"
+    static merchantQuery = "Select Chargers.Name, Merchants.Name MerchantName, MONTH(TransDate) Month, YEAR(TransDate) Year, SUM(Amount) Amount from Transactions INNER JOIN Chargers ON Transactions.ChargerId = Chargers.Id INNER JOIN Merchants ON Merchants.Id = Transactions.MerchantId WHERE Flag = 'D' group by Chargers.Name, MerchantName, MONTH(TransDate), YEAR(TransDate) order by Name, Month, Year";
+}
+
+class yearlyQueries {
+    static chargerQuery = "Select Chargers.Name, YEAR(TransDate) Year, SUM(Amount) Amount from Transactions LEFT JOIN Chargers ON Transactions.ChargerId = Chargers.Id WHERE Flag = 'D' group by Chargers.Name, YEAR(TransDate) ORDER BY `Amount` ASC";
+    static merchantQuery = "Select Chargers.Name, Merchants.Name MerchantName, YEAR(TransDate) Year, SUM(Amount) Amount from Transactions INNER JOIN Chargers ON Transactions.ChargerId = Chargers.Id INNER JOIN Merchants ON Merchants.Id = Transactions.MerchantId WHERE Flag = 'D' group by Chargers.Name, MerchantName, YEAR(TransDate) order by Name, Year";
 }
 
 class sqlStrings {
 
     static monthly = monthlyQueries;
+    static yearly = yearlyQueries;
 
     static transQueryBase = "SELECT \
     tr.Id, ch.Name as Charger, ch1.Name as Owner, TransDate, YEAR(TransDate) Year, PostDate, Amount, Merchant, merch.Name as Company, MerchantCity, MerchantState, ReferenceNumber, Flag, MCode \

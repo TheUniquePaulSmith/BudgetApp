@@ -10,6 +10,7 @@
   "author": "Paul Smith",
   "license": "ISC",
   "dependencies": {
+    "@canvasjs/charts": "^3.7.41",
     "bootstrap": "^5.3.2",
     "crypto": "^1.0.1",
     "dateformat": "^4.5.1",

@@ -10,57 +10,220 @@
     <link rel="stylesheet" href="./js/tablefilter/style/tablefilter.css" />
   </head>
   <body>
-    <script type="text/javascript" src="./js/tablefilter/tablefilter.js"></script>
+    <script
+      type="text/javascript"
+      src="./js/tablefilter/tablefilter.js"
+    ></script>
     <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="./js/jquery.min.js"></script>
-    
+    <script type="text/javascript" src="./js/app.js"></script>
+    <script type="text/javascript" src="./js/canvasjs/canvasjs.min.js"></script>
 
     <%- include('./partials/header.ejs') %>
 
-
     <div class="container mt-5">
+      <div id="chartContainer"></div>
+
       <h1>Monthly</h1>
 
       <div class="container mt-5 fixedTable">
         <h2>Total cost by charger</h2>
-        <table id="monthlyCharger" class="table table-striped table-dark"> 
-          <!-- class="table table-sm table-striped table-dark" -->
-          <thead>
+        <div class="d-flex" style="align-items: flex-start">
+          <table id="monthlyCharger" class="table table-striped table-dark">
+            <thead>
               <tr>
-                  <th scope="col">Charger</th>
-                  <th scope="col">Month</th>
-                  <th scope="col">Amount</th>
+                <th scope="col">Charger</th>
+                <th scope="col">Month</th>
+                <th scope="col">Amount</th>
               </tr>
-          </thead>
-          <tbody>
-            <% transactions.forEach(transaction => { %>
+            </thead>
+            <tbody>
+              <% monthlyChargerTransactions.forEach(transaction => { %>
               <tr>
-                  <td><%= transaction.Name %></td>
-                  <td><%= transaction.Month %></td>
-                  <td style="color: <%= parseFloat(transaction.Amount.replace('$','')) > 0 ? 'red' : 'green' %>;"><%= transaction.Amount %></td>
+                <td><%= transaction.Name %></td>
+                <td><%= transaction.Month %></td>
+                <td
+                  style="color: <%= parseFloat(transaction.Amount.replace('$','')) > 0 ? 'red' : 'green' %>;"
+                >
+                  <%= transaction.Amount %>
+                </td>
               </tr>
-          <% }); %>
-          </tbody>
-        </table>
+              <% }); %>
+            </tbody>
+          </table>
+          <div
+            class="d-flex"
+            style="
+              flex-direction: column;
+              align-items: stretch;
+              margin-left: 1%;
+            "
+          >
+            <span>Visible:</span>
+            <code>Sum:</code><span id="mc-vis-sum" class="badge"></span>
+            <code>Avg:</code><span id="mc-vis-mean" class="badge"></span>
+            <code>Min:</code><span id="mc-vis-min" class="badge"></span>
+            <code>max:</code><span id="mc-vis-max" class="badge"></span>
+            <br />
+            <br />
+            <span>Paged:</span>
+            <code>Sum:</code> <span id="mc-flt-sum" class="badge"></span>
+            <code>Avg:</code> <span id="mc-flt-mean" class="badge"></span>
+            <code>Min:</code> <span id="mc-flt-min" class="badge"></span>
+            <code>max:</code> <span id="mc-flt-max" class="badge"></span>
+          </div>
+        </div>
       </div>
-
+      <div class="container mt-5 fixedTable">
+        <h2>Total cost by Company</h2>
+        <div class="d-flex" style="align-items: flex-start">
+          <table id="monthlyMerchant" class="table table-striped table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Charger</th>
+                <th scope="col">Merchant</th>
+                <th scope="col">Month</th>
+                <th scope="col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% monthlyMerchantTransactions.forEach(transaction => { %>
+              <tr>
+                <td><%= transaction.Name %></td>
+                <td><%= transaction.MerchantName %></td>
+                <td><%= transaction.Month %></td>
+                <td
+                  style="color: <%= parseFloat(transaction.Amount.replace('$','')) > 0 ? 'red' : 'green' %>;"
+                >
+                  <%= transaction.Amount %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <div
+            class="d-flex"
+            style="
+              flex-direction: column;
+              align-items: stretch;
+              margin-left: 1%;
+            "
+          >
+            <span>Visible:</span>
+            <code>Sum:</code><span id="mm-vis-sum" class="badge"></span>
+            <code>Avg:</code><span id="mm-vis-mean" class="badge"></span>
+            <code>Min:</code><span id="mm-vis-min" class="badge"></span>
+            <code>max:</code><span id="mm-vis-max" class="badge"></span>
+            <br />
+            <br />
+            <span>Paged:</span>
+            <code>Sum:</code> <span id="mm-flt-sum" class="badge"></span>
+            <code>Avg:</code> <span id="mm-flt-mean" class="badge"></span>
+            <code>Min:</code> <span id="mm-flt-min" class="badge"></span>
+            <code>max:</code> <span id="mm-flt-max" class="badge"></span>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!--YEARLY-->
+
     <div class="container mt-5">
       <h1>Yearly</h1>
+      <div class="container mt-5 fixedTable">
+        <h2>Total by Charger</h2>
+        <div class="d-flex" style="align-items: flex-start">
+          <table id="yearlyCharger" class="table table-striped table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Charger</th>
+                <th scope="col">Year</th>
+                <th scope="col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% yearlyChargerTransactions.forEach(transaction => { %>
+              <tr>
+                <td><%= transaction.Name %></td>
+                <td><%= transaction.Year %></td>
+                <td
+                  style="color: <%= parseFloat(transaction.Amount.replace('$','')) > 0 ? 'red' : 'green' %>;"
+                >
+                  <%= transaction.Amount %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="container mt-5 fixedTable">
+        <h2>Total by Merchant</h2>
+        <div class="d-flex" style="align-items: flex-start">
+          <table id="yearlyMerchant" class="table table-striped table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Charger</th>
+                <th scope="col">Merchant</th>
+                <th scope="col">Year</th>
+                <th scope="col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% yearlyMerchantTransactions.forEach(transaction => { %>
+              <tr>
+                <td><%= transaction.Name %></td>
+                <td><%= transaction.MerchantName %></td>
+                <td><%= transaction.Year %></td>
+                <td
+                  style="color: <%= parseFloat(transaction.Amount.replace('$','')) > 0 ? 'red' : 'green' %>;"
+                >
+                  <%= transaction.Amount %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <div
+            class="d-flex"
+            style="
+              flex-direction: column;
+              align-items: stretch;
+              margin-left: 1%;
+            "
+          >
+            <span>Visible:</span>
+            <code>Sum:</code><span id="ym-vis-sum" class="badge"></span>
+            <code>Avg:</code><span id="ym-vis-mean" class="badge"></span>
+            <code>Min:</code><span id="ym-vis-min" class="badge"></span>
+            <code>max:</code><span id="ym-vis-max" class="badge"></span>
+            <br />
+            <br />
+            <span>Paged:</span>
+            <code>Sum:</code> <span id="ym-flt-sum" class="badge"></span>
+            <code>Avg:</code> <span id="ym-flt-mean" class="badge"></span>
+            <code>Min:</code> <span id="ym-flt-min" class="badge"></span>
+            <code>max:</code> <span id="ym-flt-max" class="badge"></span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-      var tf = new TableFilter(document.querySelector('#monthlyCharger'), {
-          base_path: '/js/tablefilter/',
+      //Monthly Chargers
+      var tf_monthlyChargers = new TableFilter(
+        document.querySelector("#monthlyCharger"),
+        {
+          base_path: "/js/tablefilter/",
           paging: {
-            results_per_page: ['Records: ', [10, 25, 50, 100]]
+            results_per_page: ["Records: ", [10, 25, 50, 100]],
           },
           state: {
-            types: ['local_storage'],
+            types: ["local_storage"],
             filters: true,
             page_number: true,
             page_length: true,
-            sort: true
+            sort: true,
           },
           grid_layout: false,
           alternate_rows: false,
@@ -69,18 +232,202 @@
           loader: true,
           status_bar: true,
           col_types: [
-            'string',
-            {type: 'date', locale: 'en-US', format: ['{mmmm - yy}']},
-            'formatted-number',
+            "string",
+            { type: "date", locale: "en-US", format: ["{mmmm - yy}"] },
+            "formatted-number",
           ],
-          col_0: 'select',
-          col_1: 'select',
-          extensions:[{
-            name: 'sort'
-        }]
-      });
-      tf.init();
-      </script>
+          col_0: "select",
+          col_1: "select",
+          extensions: [
+            {
+              name: "sort",
+            },
+            {
+              name: "colOps",
+              col: [2],
+            },
+          ],
+        }
+      );
 
+      // subscribe to 'column-calc' event emitted whenever a calculation is
+      // performed on a column
+      tf_monthlyChargers.emitter.on(["column-calc"], calcAllMC);
+
+      tf_monthlyChargers.init();
+    </script>
+
+    <script>
+      //Monthly Merchants
+      var tf_monthlyMerchants = new TableFilter(
+        document.querySelector("#monthlyMerchant"),
+        {
+          base_path: "/js/tablefilter/",
+          paging: {
+            results_per_page: ["Records: ", [10, 25, 50, 100]],
+          },
+          state: {
+            types: ["local_storage"],
+            filters: true,
+            page_number: true,
+            page_length: true,
+            sort: true,
+          },
+          grid_layout: false,
+          alternate_rows: false,
+          btn_reset: true,
+          rows_counter: true,
+          loader: true,
+          status_bar: true,
+          col_types: [
+            "string",
+            "string",
+            { type: "date", locale: "en-US", format: ["{mmmm - yy}"] },
+            "formatted-number",
+          ],
+          col_0: "select",
+          col_1: "select",
+          col_2: "select",
+          extensions: [
+            {
+              name: "sort",
+            },
+            {
+              name: "colOps",
+              col: [3],
+            },
+          ],
+        }
+      );
+
+      // subscribe to 'column-calc' event emitted whenever a calculation is
+      // performed on a column
+      tf_monthlyMerchants.emitter.on(["column-calc"], calcAllMM);
+
+      tf_monthlyMerchants.init();
+    </script>
+
+    <script>
+      //Yearly Chargers
+      var tf_yearlyChargers = new TableFilter(
+        document.querySelector("#yearlyCharger"),
+        {
+          base_path: "/js/tablefilter/",
+          paging: {
+            results_per_page: ["Records: ", [10, 25, 50, 100]],
+          },
+          state: {
+            types: ["local_storage"],
+            filters: true,
+            page_number: true,
+            page_length: true,
+            sort: true,
+          },
+          grid_layout: false,
+          alternate_rows: false,
+          btn_reset: true,
+          rows_counter: true,
+          loader: true,
+          status_bar: true,
+          col_types: [
+            "string",
+            { type: "date", locale: "en-US", format: ["{yyyy}"] },
+            "formatted-number",
+          ],
+          col_0: "select",
+          col_1: "select",
+          extensions: [
+            {
+              name: "sort",
+            },
+            {
+              name: "colOps",
+              col: [2],
+            },
+          ],
+        }
+      );
+
+      // subscribe to 'column-calc' event emitted whenever a calculation is
+      // performed on a column
+      //tf_yearlyChargers.emitter.on(["column-calc"], calcAll(""));
+
+      tf_yearlyChargers.init();
+    </script>
+
+    <script>
+      //Yearly Merchants
+      var tf_yearlyMerchants = new TableFilter(
+        document.querySelector("#yearlyMerchant"),
+        {
+          base_path: "/js/tablefilter/",
+          paging: {
+            results_per_page: ["Records: ", [10, 25, 50, 100]],
+          },
+          state: {
+            types: ["local_storage"],
+            filters: true,
+            page_number: true,
+            page_length: true,
+            sort: true,
+          },
+          grid_layout: false,
+          alternate_rows: false,
+          btn_reset: true,
+          rows_counter: true,
+          loader: true,
+          status_bar: true,
+          col_types: [
+            "string",
+            "string",
+            { type: "date", locale: "en-US", format: ["{yyyy}"] },
+            "formatted-number",
+          ],
+          col_0: "select",
+          col_1: "select",
+          col_2: "select",
+          extensions: [
+            {
+              name: "sort",
+            },
+            {
+              name: "colOps",
+              col: [3],
+            },
+          ],
+        }
+      );
+
+      // subscribe to 'column-calc' event emitted whenever a calculation is
+      // performed on a column
+      tf_yearlyMerchants.emitter.on(["column-calc"], calcAllYM);
+
+      tf_yearlyMerchants.init();
+    </script>
+
+    <script>
+      window.onload(() => {
+        var chart = new CanvasJS.Chart("container", {
+          //Chart Options - Check https://canvasjs.com/docs/charts/chart-options/
+          title: {
+            text: "Basic Column Chart in JavaScript",
+          },
+          data: [
+            {
+              type: "column",
+              dataPoints: [
+                { label: "apple", y: 10 },
+                { label: "orange", y: 15 },
+                { label: "banana", y: 25 },
+                { label: "mango", y: 30 },
+                { label: "grape", y: 28 },
+              ],
+            },
+          ],
+        });
+        //Render Chart
+        chart.render();
+      });
+    </script>
   </body>
 </html>

@@ -174,13 +174,7 @@ function sumTableRows(tableId) {
   // Return the calculated sum
   return sum;
 }
-
-  /**
-     * Perform all calculations
-     * @param  {Object} tf       TableFilter instance
-     * @param  {Object} colOps   ColOps extension instance
-     * @param  {Number} colIndex Column index
-     */
+ 
 function calcAll(tf, colOps, colIndex) {
     calc(tf, colOps, colIndex, 'sum', true, 'vis-sum');
     calc(tf, colOps, colIndex, 'sum', false, 'flt-sum');
@@ -197,6 +191,58 @@ function calcAll(tf, colOps, colIndex) {
     calc(tf, colOps, colIndex, 'max', true, 'vis-max');
     calc(tf, colOps, colIndex, 'max', false, 'flt-max');
 }
+
+function calcAllMM(tf, colOps, colIndex) {
+  calc(tf, colOps, colIndex, 'sum', true, 'mm-vis-sum');
+  calc(tf, colOps, colIndex, 'sum', false, 'mm-flt-sum');
+
+  calc(tf, colOps, colIndex, 'mean', true, 'mm-vis-mean');
+  calc(tf, colOps, colIndex, 'mean', false, 'mm-flt-mean');
+
+  // calc(tf, colOps, colIndex, 'median', true, 'vis-median');
+  // calc(tf, colOps, colIndex, 'median', false, 'flt-median');
+
+  calc(tf, colOps, colIndex, 'min', true, 'mm-vis-min');
+  calc(tf, colOps, colIndex, 'min', false, 'mm-flt-min');
+
+  calc(tf, colOps, colIndex, 'max', true, 'mm-vis-max');
+  calc(tf, colOps, colIndex, 'max', false, 'mm-flt-max');
+}
+
+function calcAllMC(tf, colOps, colIndex) {
+  calc(tf, colOps, colIndex, 'sum', true, 'mc-vis-sum');
+  calc(tf, colOps, colIndex, 'sum', false, 'mc-flt-sum');
+
+  calc(tf, colOps, colIndex, 'mean', true, 'mc-vis-mean');
+  calc(tf, colOps, colIndex, 'mean', false, 'mc-flt-mean');
+
+  // calc(tf, colOps, colIndex, 'median', true, 'vis-median');
+  // calc(tf, colOps, colIndex, 'median', false, 'flt-median');
+
+  calc(tf, colOps, colIndex, 'min', true, 'mc-vis-min');
+  calc(tf, colOps, colIndex, 'min', false, 'mc-flt-min');
+
+  calc(tf, colOps, colIndex, 'max', true, 'mc-vis-max');
+  calc(tf, colOps, colIndex, 'max', false, 'mc-flt-max');
+}
+
+function calcAllYM(tf, colOps, colIndex) {
+  calc(tf, colOps, colIndex, 'sum', true, 'ym-vis-sum');
+  calc(tf, colOps, colIndex, 'sum', false, 'ym-flt-sum');
+
+  calc(tf, colOps, colIndex, 'mean', true, 'ym-vis-mean');
+  calc(tf, colOps, colIndex, 'mean', false, 'ym-flt-mean');
+
+  // calc(tf, colOps, colIndex, 'median', true, 'vis-median');
+  // calc(tf, colOps, colIndex, 'median', false, 'flt-median');
+
+  calc(tf, colOps, colIndex, 'min', true, 'ym-vis-min');
+  calc(tf, colOps, colIndex, 'min', false, 'ym-flt-min');
+
+  calc(tf, colOps, colIndex, 'max', true, 'ym-vis-max');
+  calc(tf, colOps, colIndex, 'max', false, 'ym-flt-max');
+}
+
 
   /**
      * Perform a specified calculation on a column and display result

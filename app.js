@@ -61,6 +61,8 @@ app.use("/js", express.static(path.join(".", "node_modules/jquery/dist")));
 app.use("/js/tablefilter", 
   express.static(path.join(".", "node_modules/tablefilter/dist/tablefilter")));
 
+app.use("/js/canvasjs", express.static(path.join(".", "node_modules/@canvasjs/charts")));
+
 //DEBUG / TEST ROUTES
 app.get("/test", (req, res) => {
   console.log("ID for this request is:", req.correlationId()); // id for this request
@@ -201,23 +203,26 @@ app.post("/login", (req, res) => {
 app.get("/dashboard", (req, res) => {
   // if (req.session.loggedin) {
     const pageName = "dashboard";
-    const page = req.query.page || 1; // Get current page from query parameter, default to page 1
-    const limit = req.query.limit == "All" ? null : Number(req.query.limit) || 50; // Number of transactions per page
-    const offset = (page - 1) * limit; // Calculate offset
     
-    //Get monthly breakdown of chargers
-    sqlClient.getMonthlyChargers(offset, limit).then((result) => {
+    async function getData() {
+      const monthlyChargers = await sqlClient.getMonthlyChargers();
+      const monthlyMerchants = await sqlClient.getMonthlyMerchants();
       
-      res.render("dashboard", { 
+      const yearlyChargers = await sqlClient.getYearlyChargers();     
+      const yearlyMerchants = await sqlClient.getYearlyMerchants();
+      
+      return res.render("dashboard", { 
         location: pageName,
         username: req.session.username,
-        transactions: result.formattedTransactions,
-        totalPages: result.totalPages,
-        limit,
-        currentPage: page
+        monthlyChargerTransactions: monthlyChargers,
+        monthlyMerchantTransactions: monthlyMerchants,
+        yearlyChargerTransactions: yearlyChargers,
+        yearlyMerchantTransactions: yearlyMerchants,
       });
 
-    });
+    }
+
+    return getData();
     
   // } else {
   //   res.redirect("/login?loginError=Not Logged In");
