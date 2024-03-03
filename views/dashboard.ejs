@@ -406,15 +406,26 @@
     </script>
 
     <script>
-      window.onload(() => {
-        var chart = new CanvasJS.Chart("container", {
+      windows.onload = function () {
+        var chart = new CanvasJS.Chart("Chartcontainer", {
           //Chart Options - Check https://canvasjs.com/docs/charts/chart-options/
           title: {
-            text: "Basic Column Chart in JavaScript",
+            text: "Monthly Spend Trend",
           },
+
+          axisX: {
+            valueFormatString: "MMM",
+            interval: 1,
+            intervalType: "month"
+          },
+
+          <% 
+          
+          %>
+
           data: [
             {
-              type: "column",
+              type: "stackedBar",
               dataPoints: [
                 { label: "apple", y: 10 },
                 { label: "orange", y: 15 },
@@ -427,7 +438,7 @@
         });
         //Render Chart
         chart.render();
-      });
+      };
     </script>
   </body>
 </html>
