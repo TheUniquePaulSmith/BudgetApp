@@ -211,6 +211,17 @@ async function getTransactions() {
     }
   }
 
+  async function findTransactionByReference(refId) {
+    const connection = await pool.getConnection();
+    try {
+      const [results, columns] = await connection.query(sqlStrings.getTransactionByRefId, [refId]);
+      return results;
+    } catch (error) {
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
 
 
 module.exports = {
@@ -224,5 +235,6 @@ module.exports = {
   getMerchants: getMerchants,
   getYearlyChargers: getYearlyChargers,
   getYearlyMerchants: getYearlyMerchants,
+  findTransactionByReference: findTransactionByReference
   
 };

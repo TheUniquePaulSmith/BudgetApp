@@ -34,6 +34,8 @@ class sqlStrings {
     static getUserFidoEntries = "SELECT * from Users where JSON_EXTRACT(PassKeys, \"$.Id\") = ?";
 
     static getMerchantsQuery = "SELECT * from Merchants"
+
+    static getTransactionByRefId = "SELECT * from Transactions WHERE ReferenceNumber = ?"
     
 }
 

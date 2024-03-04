@@ -1,5 +1,12 @@
 const sqlClient = require("./sqlClient");
 const crypto = require("crypto");
+const helper = require("./helper");
+const multer = require('multer');
+const upload = multer();
+const fs = require('fs');
+const csvParser = require('csv-parse');
+const statmentProcessor = require("./statementProcessor");
+const statementProcessor = require("./statementProcessor");
 
 function getMain(app) {
   app.get("/", (req, res) => {
@@ -231,6 +238,38 @@ function postTransactions(app) {
   });
 }
 
+function getUpload(app) {
+    const pageName = 'upload'
+    app.get("/upload", (req, res) => {
+        res.render("upload", {
+            app,
+            location: pageName,
+            username: req.session.username
+        })
+    })
+}
+
+function postUpload(app) {
+    app.post("/upload", upload.single('inputFile'), (req, res) => {
+        const data = req.file
+        
+        //There is uploaded file
+        if (data) {
+            var csvData=[];
+            fs.ReadStream.from(data.buffer)
+            .pipe(csvParser.parse({delimiter: ','}))
+                .on('data', (data) => csvData.push(data))
+                .on('end', () => {
+                    statementProcessor.processHuntingtonFile(csvData).then(() => {
+                        res.send("ok");
+                    });
+                })
+        } else {
+            res.send("no data");
+        }
+    });
+}
+
 function setupRoutes(app) {
   // GET - /
   getMain(app);
@@ -258,6 +297,12 @@ function setupRoutes(app) {
 
   // POST - /transcations
   postTransactions(app);
+
+  // Get - /upload
+  getUpload(app);
+
+  // POST - /upload
+  postUpload(app);
 
   //Output secret if OOB Mode
   sqlClient.checkOOBMode().then((oob_mode) => {

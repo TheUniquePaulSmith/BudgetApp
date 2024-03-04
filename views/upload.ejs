@@ -1,0 +1,68 @@
+<!-- views/upload.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/app.css" />
+  </head>
+  <body>
+    <script type="text/javascript" src="./js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/app.js"></script>
+
+    <%- include('./partials/header.ejs') %>
+
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">Statement Upload</div>
+            <div class="card-body">
+              <form
+                name="uploadForm"
+                id="uploadForm"
+                method="post"
+                action="/upload"
+                enctype="multipart/form-data"
+              >
+              <div class="form-group row">
+                <label for="optType" class="col-sm-2 col-form-label">File Type</label>
+                <div class="col-sm-4">
+                    <select id="optType" name="optType" class="form-control">
+                        <option selected>Huntington</option>
+                    </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputFile" class="col-sm-2 col-form-label">CSV File</label>
+                <div class="col-sm-10">
+                  <input type="file" accept=".csv, .txt" class="form-control" id="inputFile" name="inputFile">
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-10">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="gridCheck1">
+                    <label class="form-check-label" for="gridCheck1">
+                      File has Headers?
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

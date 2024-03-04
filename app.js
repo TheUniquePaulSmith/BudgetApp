@@ -9,6 +9,8 @@ const correlator = require("express-correlation-id");
 const randomstring = require("randomstring");
 const routes = require("./modules/routes");
 
+
+
 // App Config Variables
 const appName = process.env.npm_package_name || process.env.appName || "P&T Budget App";
 const PORT = process.env.PORT || 3000;
@@ -24,11 +26,10 @@ const sslOptions = {
   cert: fs.readFileSync("./keys/fractalengine.com.crt"),
 };
 
-//Helpers
-const helper = require("./modules/helper");
-
 //Create the main app
 const app = express();
+
+//Set the title
 app.set("appName", appName);
 
 // Set the View Engine for EJS
