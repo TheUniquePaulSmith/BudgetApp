@@ -1,39 +1,100 @@
 const sqlClient = require("./sqlClient");
 
 async function processHuntingtonFile(parsedData) {
-  //check headers meet expectation
-  var headerRow = parsedData.slice(0, 1)[0];
-  validateHeaderRow(headerRow);
+    //Output stats
+    let totalRecords = 0;
+    let numConflicts = 0;
+    let alreadyPosted = 0;
+    let uploaded = 0;
 
-  //Loop through each row
-  var i = 1;
-  await parsedData.slice(1).forEach(async (row) => {
-    //Validate each row has same header count and property type
-    if (row.length !== 12) {
-      throw `Invalid row ${i}`;
-    }
-    validateDataRow(row, i);
+  try {
+    //check headers meet expectation
+    var headerRow = parsedData.slice(0, 1)[0];
+    validateHeaderRow(headerRow);
 
-    //Check if row contains referencenumber (Interest transactions do not)
-    var hasRefId = row[9].length > 0;
+    //Grab all chargers so we don't have to requery each row
+    var chargersRec = await sqlClient.getChargers();
 
-    if (hasRefId) {
-      //Query database to see if transaction is already uploaded
-      const conflictResult = await sqlClient.findTransactionByReference(row[9])
+    //Begin SQL Transaction for rollback
+    var trans = await sqlClient.beginTransaction();
+
+    //create an array of promises
+    const promises = parsedData.slice(1).map(async (row, i) => {
+      //Validate each row has same header count and property type
+      if (row.length !== 12) {
+        throw `Invalid row ${i}`;
+      }
+
+      validateDataRow(row, i);
+
+      //Sanitize the data
+      var saneRec = sanitizeRecord(row);
+
+      //Check if row contains referencenumber (Interest transactions do not)
+      var hasRefId = saneRec[9].length > 0;
+
+      if (hasRefId) {
+        //Query database to see if transaction is already uploaded
+        //It can be common that the merchant tacks on charges to the same instance
+        const conflictResult = await sqlClient.findTransactionByReference(
+          saneRec[9]
+        );
         if (conflictResult.length > 0) {
-          console.log(`Conflict - ${conflictResult[0]['ReferenceNumber']}`);
+          if (!isDuplicate(conflictResult, saneRec)) {
+            //Handle non-duplicate transactions
+            console.log("Will create: " + JSON.stringify(saneRec));
+            uploaded += 1;
+          } else {
+            alreadyPosted += 1;
+          }
+          numConflicts += 1;
+        } else {
+          //Upload new transactions
+          await insertNewTransaction(sqlClient, saneRec, chargersRec);
+          uploaded += 1;
         }
-    }
-    i = i + 1;
-  });
+      }
 
-  //Handle duplicate transactions
+      i = i + 1;
+      totalRecords += 1;
+    });
 
-  //Upload new transactions
+    //Wait for all promises to be completed
+    await Promise.all(promises);
 
+    //Commit the transactions
+    await sqlClient.commitTransaction(trans);
+
+  } catch (error) {
+    console.log(`processHuntingtonFile error - ${error}`)
+  }
+
+  return {
+    status: "success",
+    records: totalRecords,
+    conflicts: numConflicts,
+    uploaded: uploaded,
+    duplicate: alreadyPosted,
+  };
+}
+
+async function insertNewTransaction(sqlClient, saneRec, chargersRec) {
   //Find matching Chargers
-  //Find matching Merchants
+  let chargerAccount = chargersRec.find((rec) => rec.AccountMask == saneRec[0]);
+  let ownerAccount = chargersRec.find((rec) => rec.AccountMask == saneRec[1]);
+
+  if (chargerAccount == undefined) {
+    throw `Unable to find charger account by mask - ${saneRec[0]}`;
+  }
+  if (ownerAccount == undefined) {
+    throw `Unable to find owner account by mask - ${saneRec[1]}`;
+  }
+
+
+
+  //Find Company based on Merchant charge
   //Find matching Categories
+  //Find matching budgets
 }
 
 function validateHeaderRow(headerRow) {
@@ -106,6 +167,41 @@ function isNumeric(str) {
     !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
     !isNaN(parseFloat(str))
   ); // ...and ensure strings of whitespace fail
+}
+
+function sanitizeRecord(row) {
+  var tmp = row;
+
+  //Strip masking characters
+  tmp[0] = tmp[0].replaceAll(".", "");
+  tmp[1] = tmp[1].replaceAll(".", "");
+
+  //Flip the debit and credit
+  tmp[4] = tmp[4] * -1;
+  return tmp;
+}
+
+function isDuplicate(dbrec, saneRec) {
+  var result = false;
+  for (let i = 0; i < dbrec.length; i++) {
+    if (
+      //Check charger is the same
+      dbrec[i].charger === saneRec[0] &&
+      //Check if owner account is same
+      dbrec[i].actowner === saneRec[1] &&
+      //Check if posted date & transaction date is the same
+      dbrec[i].TransDate.getTime() === new Date(saneRec[2]).getTime() &&
+      dbrec[i].PostDate.getTime() === new Date(saneRec[3]).getTime() &&
+      //Check that the amount is the same
+      new Number(dbrec[i].Amount) == saneRec[4] &&
+      //Check that the merchant is the same
+      dbrec[i].Merchant == saneRec[5]
+    ) {
+      result = true;
+    }
+  }
+
+  return result;
 }
 
 module.exports = {

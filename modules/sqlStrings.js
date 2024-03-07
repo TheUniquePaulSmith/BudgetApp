@@ -35,7 +35,12 @@ class sqlStrings {
 
     static getMerchantsQuery = "SELECT * from Merchants"
 
-    static getTransactionByRefId = "SELECT * from Transactions WHERE ReferenceNumber = ?"
+    static getTransactionByRefId = "SELECT ch1.AccountMask charger, ch2.AccountMask actowner, tr.* FROM `Transactions` tr \
+	LEFT JOIN Chargers ch1 ON tr.ChargerId = ch1.Id \
+    LEFT JOIN Chargers ch2 ON tr.ChargerOwnerId = ch2.Id \
+    WHERE ReferenceNumber = ?"
+
+    static getChargers = "SELECT * from Chargers";
     
 }
 

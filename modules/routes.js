@@ -260,8 +260,9 @@ function postUpload(app) {
             .pipe(csvParser.parse({delimiter: ','}))
                 .on('data', (data) => csvData.push(data))
                 .on('end', () => {
-                    statementProcessor.processHuntingtonFile(csvData).then(() => {
-                        res.send("ok");
+                    //Process the Huntington File
+                    statementProcessor.processHuntingtonFile(csvData).then((result) => {
+                        res.send(JSON.stringify(result));
                     });
                 })
         } else {

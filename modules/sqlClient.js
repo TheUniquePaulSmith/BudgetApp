@@ -15,6 +15,33 @@ const config = {
 
 const pool = mysql.createPool(config);
 
+async function beginTransaction() {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();  
+  return connection;
+}
+
+async function rollbackTransaction(connection) {
+  try {
+    await connection.rollback();
+  } catch (error) {
+   throw error; 
+  } finally {
+    connection.release();
+  }
+}
+
+async function commitTransaction(connection) {
+  try {
+    await connection.commit();  
+  } catch (error) {
+    throw error;
+  } finally {
+    connection.release();
+  }
+  
+}
+
 async function registerOOBUser(data) {
   const connection = await pool.getConnection();
 
@@ -223,8 +250,22 @@ async function getTransactions() {
     }
   }
 
+  async function getChargers() {
+    const connection = await pool.getConnection();
+    try {
+      const [results, columns] = await connection.query(sqlStrings.getChargers, []);
+      return results;
+    } catch (error) {
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
 
 module.exports = {
+  beginTransaction: beginTransaction,
+  rollbackTransaction: rollbackTransaction,
+  commitTransaction: commitTransaction,
   checkOOBMode: checkOOBMode,
   createOOBUser: registerOOBUser,
   getSettings: getSettings,
@@ -235,6 +276,7 @@ module.exports = {
   getMerchants: getMerchants,
   getYearlyChargers: getYearlyChargers,
   getYearlyMerchants: getYearlyMerchants,
-  findTransactionByReference: findTransactionByReference
+  findTransactionByReference: findTransactionByReference,
+  getChargers: getChargers
   
 };
