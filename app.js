@@ -12,13 +12,12 @@ const routes = require("./modules/routes");
 
 
 // App Config Variables
-const appName = process.env.npm_package_name || process.env.appName || "P&T Budget App";
+const appName = process.env.appName || process.env.npm_package_name || "P&T Budget App";
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET =
   process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 const INITIALP = process.env.INITIALP || randomstring.generate(12);
-const DOMAINNAME =
-  process.env.DOMAINNAME || "ptbudgetapp.home.fractalengine.com";
+const DOMAINNAME = process.env.DOMAINNAME || "ptbudgetapp.home.fractalengine.com";
 
 // Certificate Setup
 const sslOptions = {
@@ -31,6 +30,7 @@ const app = express();
 
 //Set the title
 app.set("appName", appName);
+app.set("domainName", DOMAINNAME);
 
 // Set the View Engine for EJS
 app.set("view engine", "ejs");

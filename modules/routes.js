@@ -60,7 +60,7 @@ function getLogin(app) {
 function postLogin(app) {
   app.post("/login", (req, res) => {
     try {
-      helper.isValidFidoLogin(req, sqlClient, DOMAINNAME).then((results) => {
+      helper.isValidFidoLogin(req, sqlClient, app.get("domainName")).then((results) => {
         if (results.isValid) {
           req.session.loggedin = true;
           req.session.username = results.username;
