@@ -18,8 +18,8 @@
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">Statement Upload</div>
+          <div class="card uploadCard">
+            <div class="card-header">File Statement Upload</div>
             <div class="card-body">
               <form
                 name="uploadForm"
@@ -28,37 +28,93 @@
                 action="/upload"
                 enctype="multipart/form-data"
               >
-              <div class="form-group row">
-                <label for="optType" class="col-sm-2 col-form-label">File Type</label>
-                <div class="col-sm-4">
+                <div class="form-group row">
+                  <label for="optType" class="col-sm-2 col-form-label"
+                    >Processor</label
+                  >
+                  <div class="col-sm-4">
                     <select id="optType" name="optType" class="form-control">
-                        <option selected>Huntington</option>
+                      <option selected>Huntington</option>
                     </select>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="inputFile" class="col-sm-2 col-form-label">CSV File</label>
-                <div class="col-sm-10">
-                  <input type="file" accept=".csv, .txt" class="form-control" id="inputFile" name="inputFile">
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-sm-2"></div>
-                <div class="col-sm-10">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="gridCheck1">
-                    <label class="form-check-label" for="gridCheck1">
-                      File has Headers?
-                    </label>
                   </div>
                 </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-sm-10">
-                  <button type="submit" class="btn btn-primary">Upload</button>
+                <div class="form-group row">
+                  <label for="inputFile" class="col-sm-2 col-form-label"
+                    >CSV File</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="file"
+                      accept=".csv, .txt"
+                      class="form-control"
+                      id="inputFile"
+                      name="inputFile"
+                    />
+                  </div>
                 </div>
-              </div>
+                <div class="form-group row">
+                  <div class="col-sm-2"></div>
+                  <div class="col-sm-10">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        checked
+                        id="gridCheck1"
+                      />
+                      <label class="form-check-label" for="gridCheck1">
+                        File has Headers
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        checked
+                        id="patternMatch"
+                      />
+                      <label class="form-check-label" for="patternMatch">
+                        Perform transaction pattern match
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-sm-10">
+                    <button id="uploadBtn" type="button" class="btn btn-primary" onclick="performUpload();">
+                      <span id="uploadSpinner" hidden class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      Upload
+                    </button>
+                  </div>
+                </div>
               </form>
+            </div>
+          </div>
+          <div hidden id="uploadSuccessAlert" class="alert alert-success" role="alert">
+            <h4>Success!</h4>
+            <hr />
+            <div>
+              <span># of records: </span>
+              <span id="totalRecords"></span>
+            </div>
+            <div>
+              <span># of conflicts:</span>
+              <span id="numConflicts"></span>
+            </div>
+            <div>
+              <span># uploaded</span>
+              <span id="numUploaded"></span>
+            </div>
+            <div>
+              <span># duplicates skipped</span>
+              <span id="numDuplicates"></span>
+            </div>
+          </div>
+          <div hidden id="uploadFailureAlert" class="alert alert-danger" role="alert">
+            <h4>Failed!</h4>
+            <hr />
+            <div>
+              <span id="failureDetails"></span>
             </div>
           </div>
         </div>

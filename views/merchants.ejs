@@ -20,6 +20,21 @@
 
     <%- include('./partials/header.ejs') %>
 
+    <% 
+      getPatternHtml = function(transPatterns) {
+        if (transPatterns != undefined && transPatterns.entries != undefined) {
+          transPatterns.entries.forEach((item) => { %>
+          <div>
+            <span class="badge badge-secondary">
+              <%= item.type %>
+            </span>
+            <input class="form-control" type="text" value="<%= item.pattern %>" readonly>
+        </div>
+          <% });
+      }
+    } 
+    %>
+
     <div class="container mt-5">
       <h1>Defined Merchants</h1>
       <table
@@ -30,6 +45,7 @@
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Description</th>
+            <th scope="col">Transaction Patterns</th>
             <th scope="col">Action</th>
           </tr>
         </thead>
@@ -38,6 +54,9 @@
           <tr>
             <td><%= merchant.Name %></td>
             <td><%= merchant.Description %></td>
+            <td>
+             <%= getPatternHtml(merchant.TransPatterns); %>
+            </td>
             <td>
               <div class="d-flex">
                 <div>
@@ -136,7 +155,7 @@
         rows_counter: true,
         loader: true,
         status_bar: true,
-        col_types: ["string", "string", "none"],
+        col_types: ["string", "string", "string", "none"],
         extensions: [
           {
             name: "sort",

@@ -5,7 +5,6 @@ const multer = require('multer');
 const upload = multer();
 const fs = require('fs');
 const csvParser = require('csv-parse');
-const statmentProcessor = require("./statementProcessor");
 const statementProcessor = require("./statementProcessor");
 
 function getMain(app) {
@@ -181,6 +180,7 @@ function getMerchants(app) {
 
     sqlClient.getMerchants().then((merchants) => {
       res.render("merchants", {
+        app,
         location: pageName,
         username: req.session.username,
         merchants,
@@ -265,8 +265,21 @@ function postUpload(app) {
                         res.send(JSON.stringify(result));
                     });
                 })
+                .on('error', (err) => {
+                  //Return the error back to client
+                  res.send(
+                    {
+                      status: "error",
+                      message: err.code,
+                    }
+                  )
+                  console.error(`csvParser error - ${err}`)
+                })
         } else {
-            res.send("no data");
+            res.send({
+              status: "error",
+              message: "No data submitted"
+            });
         }
     });
 }

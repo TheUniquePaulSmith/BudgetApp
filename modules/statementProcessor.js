@@ -66,7 +66,11 @@ async function processHuntingtonFile(parsedData) {
     await sqlClient.commitTransaction(trans);
 
   } catch (error) {
-    console.log(`processHuntingtonFile error - ${error}`)
+    console.error(`processHuntingtonFile error - ${error}`)
+    return {
+      status: "error",
+      message: error,
+    }
   }
 
   return {

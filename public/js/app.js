@@ -303,3 +303,66 @@ function formatCurrency(number) {
   });
   return formatter.format(number);
 }
+
+
+function performUpload() {
+
+  //Hide the forms
+  $("#uploadSuccessAlert").attr("hidden", true);
+  $("#uploadFailureAlert").attr("hidden", true);
+
+  $("#uploadSpinner").attr("hidden", null);
+  $("#uploadBtn").attr("disabled", true);
+
+  const formData = new FormData();
+  const fileField = document.querySelector('input[type="file"]');
+
+  formData.append("optType", (document.querySelector('select').value))
+  formData.append("inputFile", fileField.files[0]);
+  formData.append("gridCheck1", ($("#gridCheck1")[0].checked))
+  formData.append("patternMatch", ($("#patternMatch")[0].checked))
+
+  fetch("/upload", {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    body: formData
+  }
+  ).then((respObj) => {
+    respObj.json().then((resp) => {
+      if (resp.status == "success") {
+        showUploadSuccess(resp);
+      } else {
+        showUploadFailure(resp.message);
+      }
+    });
+  }).catch((err) => {
+    console.error("Upload failed - ". err);
+    showUploadFailure("Failed", err)
+  })
+
+  document.forms['uploadForm'].reset();
+
+}
+
+function showUploadSuccess(resp) {
+  $("#totalRecords").text(resp.records);
+  $("#numConflicts").text(resp.conflicts);
+  $("#numUploaded").text(resp.uploaded);
+  $("#numDuplicates").text(resp.duplicate);
+  $("#uploadSuccessAlert").attr("hidden",null);
+ 
+  $("#uploadSpinner").attr("hidden", true);
+  $("#uploadBtn").attr("disabled", false);
+
+
+}
+
+function showUploadFailure(message) {
+  $("#failureDetails").text(message);
+  $("#uploadFailureAlert").attr("hidden",null);
+
+  $("#uploadSpinner").attr("hidden", true);
+  $("#uploadBtn").attr("disabled", false);
+
+}
