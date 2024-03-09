@@ -35,6 +35,17 @@ class sqlStrings {
 
     static getMerchantsQuery = "SELECT * from Merchants"
 
+    static findMatchingMerchantQuery = "SELECT \
+    MerchantId \
+    FROM Transactions \
+    where MerchantId is not null \
+    AND Merchant = ? \
+    limit 1"
+
+    static insertNewTransaction = "INSERT INTO Transactions \
+    (ChargerID, ChargerOwnerId, TransDate, PostDate, Amount, Merchant, MerchantId, MerchantCity, MerchantState, ReferenceNumber, Flag) \
+    VALUES (?, ?, ?, ?, ?, NULLIF(?, ''), NULLIF(?,''), NULLIF(?,''), NULLIF(?,''), NULLIF(?,''), ?)"
+
     static getTransactionByRefId = "SELECT ch1.AccountMask charger, ch2.AccountMask actowner, tr.* FROM `Transactions` tr \
 	LEFT JOIN Chargers ch1 ON tr.ChargerId = ch1.Id \
     LEFT JOIN Chargers ch2 ON tr.ChargerOwnerId = ch2.Id \

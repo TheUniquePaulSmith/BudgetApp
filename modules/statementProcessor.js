@@ -7,6 +7,9 @@ async function processHuntingtonFile(parsedData) {
     let alreadyPosted = 0;
     let uploaded = 0;
 
+     //Begin SQL Transaction for rollback
+     var trans = await sqlClient.beginTransaction();
+
   try {
     //check headers meet expectation
     var headerRow = parsedData.slice(0, 1)[0];
@@ -15,8 +18,8 @@ async function processHuntingtonFile(parsedData) {
     //Grab all chargers so we don't have to requery each row
     var chargersRec = await sqlClient.getChargers();
 
-    //Begin SQL Transaction for rollback
-    var trans = await sqlClient.beginTransaction();
+    //Grab all merchants so we don't have to requery for each row
+    var merchantsRec = await sqlClient.getMerchants();
 
     //create an array of promises
     const promises = parsedData.slice(1).map(async (row, i) => {
@@ -25,12 +28,13 @@ async function processHuntingtonFile(parsedData) {
         throw `Invalid row ${i}`;
       }
 
+      //Validate the data row contains expected datatypes and columns
       validateDataRow(row, i);
 
-      //Sanitize the data
+      //Sanitize the row for input
       var saneRec = sanitizeRecord(row);
 
-      //Check if row contains referencenumber (Interest transactions do not)
+      //Check if row contains referencenumber (Interest posted transactions do not since they aren't CC charges)
       var hasRefId = saneRec[9].length > 0;
 
       if (hasRefId) {
@@ -53,8 +57,11 @@ async function processHuntingtonFile(parsedData) {
           await insertNewTransaction(sqlClient, saneRec, chargersRec);
           uploaded += 1;
         }
+      } else {
+        //Post chargers like interest that do not have ReferenceNumber
+        await insertNewTransaction(sqlClient, saneRec, chargersRec);
+        uploaded += 1;
       }
-
       i = i + 1;
       totalRecords += 1;
     });
@@ -66,7 +73,12 @@ async function processHuntingtonFile(parsedData) {
     await sqlClient.commitTransaction(trans);
 
   } catch (error) {
-    console.error(`processHuntingtonFile error - ${error}`)
+    try {
+      console.error(`processHuntingtonFile error - ${error}`)
+      sqlClient.rollbackTransaction(trans);
+    } catch (err) {
+      console.error(`processHuntingtonFile - Rollback error ${err}`)
+    }
     return {
       status: "error",
       message: error,
@@ -82,10 +94,10 @@ async function processHuntingtonFile(parsedData) {
   };
 }
 
-async function insertNewTransaction(sqlClient, saneRec, chargersRec) {
+async function insertNewTransaction(sqlClient, saneRec, chargersRec, merchantsRec) {
   //Find matching Chargers
-  let chargerAccount = chargersRec.find((rec) => rec.AccountMask == saneRec[0]);
-  let ownerAccount = chargersRec.find((rec) => rec.AccountMask == saneRec[1]);
+  let chargerAccount = chargersRec.find((rec) => rec.AccountMask == saneRec[0])["Id"];
+  let ownerAccount = chargersRec.find((rec) => rec.AccountMask == saneRec[1])["Id"];
 
   if (chargerAccount == undefined) {
     throw `Unable to find charger account by mask - ${saneRec[0]}`;
@@ -94,11 +106,27 @@ async function insertNewTransaction(sqlClient, saneRec, chargersRec) {
     throw `Unable to find owner account by mask - ${saneRec[1]}`;
   }
 
+  //Find Company based on Merchant charge by existing 
+  var matchingMerchant = await sqlClient.findMatchingMerchant(saneRec[5]);
+  
+  sqlClient.insertNewTransaction(
+    chargerAccount, //Original Account Number
+    ownerAccount, //Account Number
+    saneRec[2], //Transaction Date
+    saneRec[3], //Posting Date
+    saneRec[4], //Billing Amount
+    saneRec[5], //Merchant
+    matchingMerchant.length > 0 ? matchingMerchant[0].MerchantId : '', //Matching Merchant
+    saneRec[6], //Merchant City
+    saneRec[7], //Merchant State
+    saneRec[9], //ReferenceNumber
+    saneRec[10] //Flag
+    );
 
-
-  //Find Company based on Merchant charge
   //Find matching Categories
+
   //Find matching budgets
+  //TODO: Create budgets logic
 }
 
 function validateHeaderRow(headerRow) {
@@ -179,6 +207,10 @@ function sanitizeRecord(row) {
   //Strip masking characters
   tmp[0] = tmp[0].replaceAll(".", "");
   tmp[1] = tmp[1].replaceAll(".", "");
+
+  //Fix Date fields for MySQL - YYYY-MM-DD
+  tmp[2] = (new Date(tmp[2])).toISOString().substring(0,10)
+  tmp[3] = (new Date(tmp[3])).toISOString().substring(0,10)
 
   //Flip the debit and credit
   tmp[4] = tmp[4] * -1;

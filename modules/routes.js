@@ -210,6 +210,7 @@ function getTransactions(app) {
 
     sqlClient.getTransactions().then((result) => {
       res.render("transactions", {
+        app,
         location: pageName,
         username: req.session.username,
         transactions: result.formattedTransactions,
@@ -270,7 +271,7 @@ function postUpload(app) {
                   res.send(
                     {
                       status: "error",
-                      message: err.code,
+                      message: err.message,
                     }
                   )
                   console.error(`csvParser error - ${err}`)

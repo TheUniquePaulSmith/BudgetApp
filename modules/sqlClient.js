@@ -25,7 +25,8 @@ async function rollbackTransaction(connection) {
   try {
     await connection.rollback();
   } catch (error) {
-   throw error; 
+   console.error(`Rollback Transaction failed: ${error}`)
+    throw error; 
   } finally {
     connection.release();
   }
@@ -238,6 +239,18 @@ async function getTransactions() {
     }
   }
 
+  async function findMatchingMerchant(merchant) {
+    const connection = await pool.getConnection();
+    try {
+      const [results, columns] = await connection.query(sqlStrings.findMatchingMerchantQuery, [merchant]);
+      return results;
+    } catch (error) {
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
   async function findTransactionByReference(refId) {
     const connection = await pool.getConnection();
     try {
@@ -262,6 +275,30 @@ async function getTransactions() {
     }
   }
 
+  async function insertNewTransaction(chargerId, chargerOwnerId, TransDate, PostDate, Amount, Merchant, MerchantId, MerchantCity, MerchantState, ReferenceNumber, Flag) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.execute(sqlStrings.insertNewTransaction, 
+        [
+          chargerId, 
+          chargerOwnerId,
+          TransDate,
+          PostDate,
+          Amount,
+          Merchant,
+          MerchantId,
+          MerchantCity,
+          MerchantState,
+          ReferenceNumber,
+          Flag
+        ])
+    } catch (error) {
+      throw error
+    } finally {
+      connection.release();
+    }
+  }
+
 module.exports = {
   beginTransaction: beginTransaction,
   rollbackTransaction: rollbackTransaction,
@@ -277,6 +314,8 @@ module.exports = {
   getYearlyChargers: getYearlyChargers,
   getYearlyMerchants: getYearlyMerchants,
   findTransactionByReference: findTransactionByReference,
-  getChargers: getChargers
+  getChargers: getChargers,
+  findMatchingMerchant: findMatchingMerchant,
+  insertNewTransaction: insertNewTransaction,
   
 };
