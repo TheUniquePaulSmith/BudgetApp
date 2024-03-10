@@ -48,6 +48,7 @@ function getLogin(app) {
           req.session.sChallenge = buffer.toString("hex");
           req.session.loggedin = session.loggedin;
           res.render("login", {
+            app,
             loginError,
             sChallenge: req.session.sChallenge,
           });
@@ -126,6 +127,7 @@ function postMain(app) {
               });
           } catch (error) {
             res.render("oob", {
+              app,
               registerError: error,
               sChallenge: req.session.sChallenge,
             });
@@ -193,7 +195,11 @@ function getSettings(app) {
   //Settings page
   app.get("/settings", (req, res) => {
     if (req.session.loggedin) {
-      res.render("settings");
+      res.render("settings", {
+        app,
+        username: req.session.username,
+        location: "settings",
+      });
     } else {
       res.redirect("/?loginError=Not Logged In");
     }

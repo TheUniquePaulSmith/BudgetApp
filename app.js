@@ -56,18 +56,28 @@ app.use(
   "/js",
   express.static(path.join(".", "node_modules/bootstrap/dist/js"))
 );
+
+//Publish Static JQuery files
 app.use("/js", express.static(path.join(".", "node_modules/jquery/dist")));
+
+//Publish Static TableFilter files
 app.use("/js/tablefilter", 
   express.static(path.join(".", "node_modules/tablefilter/dist/tablefilter")));
 
-app.use("/js/canvasjs", express.static(path.join(".", "node_modules/@canvasjs/charts")));
+//Publish Static Canvas Charts files
+  app.use("/js/canvasjs", express.static(path.join(".", "node_modules/@canvasjs/charts")));
+
+//Publish Static chart.js Files
+app.use("/js/chart.js", express.static(path.join(".", "node_modules/chart.js/dist")));
 
 //DEBUG / TEST ROUTES
 app.get("/test", (req, res) => {
-  console.log("ID for this request is:", req.correlationId()); // id for this request
-  console.log("ID for this request is:", correlator.getId()); // equal to above, not dependant on the req object
-  console.log(req.sessionID);
-  res.end();
+  
+  res.render("test", {
+    username: null,
+    location: "test",
+    app
+  });
 });
 
 //Register defined routes
