@@ -51,6 +51,16 @@ class sqlStrings {
     LEFT JOIN Chargers ch2 ON tr.ChargerOwnerId = ch2.Id \
     WHERE ReferenceNumber = ?"
 
+    static lookUpTransactionInterest = "SELECT chr.AccountMask, tr.TransDate, tr.PostDate, tr.Amount, tr.Merchant  \
+    FROM `Transactions` tr \
+    INNER JOIN Chargers chr \
+    ON tr.ChargerOwnerId = chr.Id \
+    WHERE tr.Merchant = 'Interest' \
+    AND AccountMask = ? \
+    AND TransDate = ? \
+    AND PostDate = ? \
+    AND Amount = ?";
+
     static getChargers = "SELECT * from Chargers";
     
 }

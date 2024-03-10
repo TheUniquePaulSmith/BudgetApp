@@ -46,7 +46,7 @@ async function processHuntingtonFile(parsedData) {
         if (conflictResult.length > 0) {
           if (!isDuplicate(conflictResult, saneRec)) {
             //Handle non-duplicate transactions
-            console.log("Will create: " + JSON.stringify(saneRec));
+            await insertNewTransaction(sqlClient, saneRec, chargersRec);
             uploaded += 1;
           } else {
             alreadyPosted += 1;
@@ -59,9 +59,15 @@ async function processHuntingtonFile(parsedData) {
         }
       } else {
         //Post chargers like interest that do not have ReferenceNumber
-        await insertNewTransaction(sqlClient, saneRec, chargersRec);
-        uploaded += 1;
-      }
+        //validate we don't re-post the same interest charge by looking at dates + amount + merchant = Interest
+        if (await isDuplicateInterest(saneRec)) {
+          //Don't upload as already posted
+          alreadyPosted += 1;
+        } else {
+          await insertNewTransaction(sqlClient, saneRec, chargersRec);
+          uploaded += 1;
+        }
+      }  
       i = i + 1;
       totalRecords += 1;
     });
@@ -81,7 +87,7 @@ async function processHuntingtonFile(parsedData) {
     }
     return {
       status: "error",
-      message: error,
+      message: error.message == null ? error : error.message,
     }
   }
 
@@ -226,8 +232,8 @@ function isDuplicate(dbrec, saneRec) {
       //Check if owner account is same
       dbrec[i].actowner === saneRec[1] &&
       //Check if posted date & transaction date is the same
-      dbrec[i].TransDate.getTime() === new Date(saneRec[2]).getTime() &&
-      dbrec[i].PostDate.getTime() === new Date(saneRec[3]).getTime() &&
+      dbrec[i].TransDate.getTime() === new Date(saneRec[2]+' UTC').getTime() &&
+      dbrec[i].PostDate.getTime() === new Date(saneRec[3]+ 'UTC').getTime() &&
       //Check that the amount is the same
       new Number(dbrec[i].Amount) == saneRec[4] &&
       //Check that the merchant is the same
@@ -238,6 +244,20 @@ function isDuplicate(dbrec, saneRec) {
   }
 
   return result;
+}
+
+async function isDuplicateInterest(saneRec) {
+  const query = await sqlClient.lookUpTransactionInterest(
+    saneRec[1],
+    saneRec[2],
+    saneRec[3],
+    saneRec[4]
+    );
+
+    if (query && query.length > 0) {
+      return true
+    }
+    return false;
 }
 
 module.exports = {

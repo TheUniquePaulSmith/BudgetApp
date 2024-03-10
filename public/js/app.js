@@ -347,9 +347,9 @@ function performUpload() {
 
 function showUploadSuccess(resp) {
   $("#totalRecords").text(resp.records);
-  $("#numConflicts").text(resp.conflicts);
-  $("#numUploaded").text(resp.uploaded);
-  $("#numDuplicates").text(resp.duplicate);
+  $("#numConflicts").text(resp.conflicts + " / " + resp.records);
+  $("#numUploaded").text(resp.uploaded + " / " + resp.records);
+  $("#numDuplicates").text(resp.duplicate + " / " + resp.conflicts);
   $("#uploadSuccessAlert").attr("hidden",null);
  
   $("#uploadSpinner").attr("hidden", true);

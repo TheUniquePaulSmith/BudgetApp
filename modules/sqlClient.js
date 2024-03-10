@@ -10,7 +10,8 @@ const config = {
   database: "Huntington",
   waitForConnections: true,
   connectionLimit: 20,
-  queueLimit: 0
+  queueLimit: 0,
+  timezone : "+00:00"
 };
 
 const pool = mysql.createPool(config);
@@ -299,6 +300,18 @@ async function getTransactions() {
     }
   }
 
+  async function lookUpTransactionInterest(accountMask, TransDate, PostDate, Amount) {
+    const connection = await pool.getConnection();
+    try {
+      const [results, columns] = await connection.query(sqlStrings.lookUpTransactionInterest, [accountMask, TransDate, PostDate, Amount])
+      return results;
+    } catch (error) {
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
 module.exports = {
   beginTransaction: beginTransaction,
   rollbackTransaction: rollbackTransaction,
@@ -317,5 +330,6 @@ module.exports = {
   getChargers: getChargers,
   findMatchingMerchant: findMatchingMerchant,
   insertNewTransaction: insertNewTransaction,
+  lookUpTransactionInterest: lookUpTransactionInterest
   
 };
